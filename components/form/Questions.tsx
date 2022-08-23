@@ -1,56 +1,132 @@
-import { useEffect, useState } from "react";
-import { QuestionRequest } from "../../types/form.types";
+import { Button, Container } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { ApiForm } from '../../pages/api/apiForm'
+import { Question, QuestionForm, QuestionRes, QuestionTypeEnum } from '../../types/question.request.types'
+import { QuestionItem } from './QuestionItems'
 
-export const Questions = () => {
-  const [questions, setQuestions] = useState<QuestionRequest[]>([]);
-  useEffect(() => {
-    if (questions.length === 0) {
-      setQuestions([{ questionText: "¿Cual es tu nombre?", questionImage: "", options: [{ optionText: "Option 1", optionImage: "" }] }]);
+interface QuestionsProps {
+  id: string | string[] | undefined
+}
+const initalValues: QuestionForm = {
+  formId: '63018700cf26f7ba57ab39f1',
+  questions: [
+    {
+      questionText: 'What is your name?',
+      questionType: QuestionTypeEnum.RESPUESTA_CORTA,
+      questionImage: '',
+      options: [
+        {
+          optionText: '',
+          optionImage: ''
+        }
+      ]
     }
-  }, []);
+  ]
+}
+const initalQuestions: Question = {
+  questionText: 'Ingrese Pregunta',
+  questionType: QuestionTypeEnum.RESPUESTA_CORTA,
+  questionImage: '',
+  options: [
+    {
+      optionText: '',
+      optionImage: ''
+    }
+  ]
+}
+export const Questions = (props: QuestionsProps) => {
+  console.log('rendered')
+  const { id } = props
+  const [questions, setQuestions] = useState(initalValues)
+  useEffect(() => {
+    if (id) {
+      const GetQuestions = async () => {
+        const questionsBack = await ApiForm().get<QuestionRes[]>(`/Question?formId=${id.toString()}`)
+        const { data } = questionsBack
+        setQuestions({
+          ...questions,
+          formId: id.toString(),
+          questions: data.map(item => {
+            return {
+              questionText: item.questionText,
+              questionImage: item.questionImage,
+              questionType: item.questionType,
+              options: item.options.map(option => {
+                return {
+                  optionText: option.optionText,
+                  optionImage: option.optionImage
+                }
+              })
+            }
+          })
+        })
+      }
+      GetQuestions()
+      setQuestions({ ...questions, formId: id.toString() })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
   const addQuestion = () => {
-    setQuestions([...questions, { questionText: "¿Cual es tu nombre?", questionImage: "", options: [{ optionText: "Option 1", optionImage: "" }] }]);
+    setQuestions({ ...questions, questions: [...questions.questions, initalQuestions] })
   }
-  const removeQuestion = (index: number) => {
-    const newQuestions = [...questions];
-    newQuestions.splice(index, 1);
-    setQuestions(newQuestions);
+  const addOption = (questionIndex: number) => {
+    const newQuestions = [...questions.questions]
+    newQuestions[questionIndex].options.push({ optionText: 'Opcion', optionImage: '' })
+    setQuestions({ ...questions, questions: newQuestions })
   }
-  const addOption = (index: number) => {
-    const newQuestions = [...questions];
-    newQuestions[index].options.push({ optionText: "Option 1", optionImage: "" });
-    setQuestions(newQuestions);
+  const handleChangeQuestion = (e: any, index: number) => {
+    setQuestions({ ...questions, questions: [...questions.questions.slice(0, index), { ...questions.questions[index], questionText: e.target.value }, ...questions.questions.slice(index + 1)] })
   }
-  const handleChangeQuestionText = (index: number, value: string) => {
-    const newQuestions = [...questions];
-    newQuestions[index].questionText = value;
-    setQuestions(newQuestions);
+  const handleChangeQuestionType = (e: any, index: number) => {
+    setQuestions({ ...questions, questions: [...questions.questions.slice(0, index), { ...questions.questions[index], questionType: e.target.value, options: [{ optionImage: '', optionText: '' }] }, ...questions.questions.slice(index + 1)] })
   }
-console.log(questions);
+  const handleChangeOption = (e: string, questionIndex: number, indexOption: number) => {
+    console.log(e, questionIndex, indexOption)
+    setQuestions({ ...questions, questions: [...questions.questions.slice(0, questionIndex), { ...questions.questions[questionIndex], options: [...questions.questions[questionIndex].options.slice(0, indexOption), { ...questions.questions[questionIndex].options[indexOption], optionText: e }, ...questions.questions[questionIndex].options.slice(indexOption + 1)] }, ...questions.questions.slice(questionIndex + 1)] })
+  }
+  const removeOption = (questionIndex: number, indexOption: number) => {
+    const newQuestions = [...questions.questions]
+    newQuestions[questionIndex].options.splice(indexOption, 1)
+    setQuestions({ ...questions, questions: newQuestions })
+  }
+  const handleSubmit = (e: any) => {
+    e.preventDefault()
+    ApiForm().post('/Question', questions).then(res => {
+      console.log(res)
+    }).catch(err => {
+      console.log(err)
+    })
+  }
   return (
-    <div>
-      {questions.map((question, questionindex) => (
-        <>
-          <h1>Questions</h1>
-          <form>
-            <label>
-              Question:
-              <input type="text" name="Question" value={question.questionText} onChange={(e)=> handleChangeQuestionText(questionindex, e.target.value)} />
-            </label>
-            { question.options.map((option, optionindex) => (
-              <>
-                <label>
-                  Option:
-                  <input type="text" name="Option" value={option.optionText} />
-                </label>
-                <button onClick={(e) => {e.preventDefault(); addOption(questionindex)}}> add option</button>
-              </>
-            ))}
-            <button onClick={(e) => {e.preventDefault(); addQuestion()}}>Add Question</button>
-          </form>
-        </>
-      ))}
+    <Container className='py-5'>
+      <span className='text-black text-2xl'>Preguntas</span>
+      <form>
+        {questions.questions.map((question, questionindex) => (
+          <QuestionItem
+            key={questionindex}
+            question={question}
+            addOption={addOption}
+            removeOption={removeOption}
+            handleChangeQuestion={handleChangeQuestion}
+            handleChangeQuestionType={handleChangeQuestionType}
+            handleChangeOption={handleChangeOption}
+            addQuestion={addQuestion}
+            index={questionindex}
+            questionLength={questions.questions.length}
+            />
 
-    </div>
+        ))}
+        <Button
+          className='border bg-red-500'
+          onClick={e => handleSubmit(e)}
+          type='submit'
+          variant='contained'
+          color='primary'
+          style={{ textTransform: 'none' }}
+        >
+          Guardar formulario
+        </Button>
+      </form>
+    </Container>
   )
 }
