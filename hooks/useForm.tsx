@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 import { ApiForm } from '../pages/api/apiForm'
-import { Form } from '../types/form.responses.types'
+import { Form } from '../types/response/form.type'
 
 export const useForm = (id: string | string[] | undefined) => {
   const instance = ApiForm()
@@ -10,7 +10,6 @@ export const useForm = (id: string | string[] | undefined) => {
   useEffect(() => {
     const getForm = async () => {
       try {
-        console.log(id)
         if (!id) return
         const result = await instance.get(`form/id?id=${id.toString()}`)
         const { data } = result

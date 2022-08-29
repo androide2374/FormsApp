@@ -1,4 +1,4 @@
-import { AppBar, Button, Toolbar, Typography } from '@mui/material'
+import { AppBar as AppBarMaterial, Button, Toolbar, Typography } from '@mui/material'
 
 interface AppBarProps {
   title: string
@@ -6,9 +6,9 @@ interface AppBarProps {
   onShare?: () => void
 }
 
-export const AppBarComponent = (props: AppBarProps) => {
+export const AppBar = (props: AppBarProps) => {
   // const { title, share, onShare } = props
-  return (<AppBar position="static">
+  return (<AppBarMaterial position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Su logo Aqui
@@ -18,5 +18,5 @@ export const AppBarComponent = (props: AppBarProps) => {
           }
           <Button color="inherit">Compartir</Button>
         </Toolbar>
-      </AppBar>)
+      </AppBarMaterial>)
 }

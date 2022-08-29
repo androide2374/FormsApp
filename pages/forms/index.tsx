@@ -1,12 +1,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FormRequest, FormTypeEnum } from '../../types/form.types'
+import { FormRequest, FormTypeEnum } from '../../types/request/form.type'
 import { ApiForm } from '../api/apiForm'
 export default function FormManager () {
   const router = useRouter()
   const instance = ApiForm()
   const crearFormulario = () => {
-    console.log('Crear formulario')
     const initialFormData: FormRequest = {
       name: 'Nuevo Formulario',
       description: '',

@@ -7,8 +7,35 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater'
 import DateRangeIcon from '@mui/icons-material/DateRange'
 import { SvgIconTypeMap } from '@mui/material'
 import { OverridableComponent } from '@mui/material/OverridableComponent'
-import { QuestionTypeEnum } from './question.request.types'
 
+export interface QuestionForm {
+  formId: string
+  questions: Question[]
+}
+
+export interface Question {
+  questionText: string
+  questionImage: string
+  questionType: number
+  isRequire: boolean
+  options: Option[]
+}
+
+export interface Option {
+  optionImage: string
+  optionText: string
+}
+
+export enum QuestionTypeEnum {
+  OPCION_MULTIPLE,
+  CASILLAS_DE_VERIFICACION,
+  LISTA_DESPLEGABLE,
+  CARGA_DE_ARCHIVOS,
+  FECHA,
+  HORA,
+  RESPUESTA_CORTA,
+  RESPUESTA_PARRAFO,
+}
 interface QuestionTypesListTypes{
   [key: string]: {
     id: QuestionTypeEnum
@@ -59,4 +86,21 @@ export const QuestionTypesList: QuestionTypesListTypes = {
     name: 'Lista desplegable',
     icon: ExpandMoreIcon
   }
+}
+
+export interface QuestionRes {
+  createdAt: Date
+  id: string
+  options: OptionRes[]
+  questionImage: string
+  questionText: string
+  questionType: number
+  updateAt: Date
+  isRequire: boolean
+}
+
+export interface OptionRes {
+  id: string
+  optionImage: string
+  optionText: string
 }

@@ -1,5 +1,5 @@
 import { Icon, TextField } from '@mui/material'
-import { Option, QuestionTypeEnum, QuestionTypesList } from '../../types/question.request.types'
+import { Option, QuestionTypeEnum, QuestionTypesList } from '../../types/response/question.type'
 
 interface OptionProps {
   questionType: QuestionTypeEnum

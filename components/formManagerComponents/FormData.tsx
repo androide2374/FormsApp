@@ -1,9 +1,11 @@
-import { Button, Container, TextField } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
+import { Alert, Container, Snackbar, TextField } from '@mui/material'
 import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useForm } from '../../hooks/useForm'
 import { ApiForm } from '../../pages/api/apiForm'
-import { Form as FormType } from '../../types/form.responses.types'
+import { Form, Form as FormType } from '../../types/response/form.type'
+import SaveIcon from '@mui/icons-material/Save'
 
 const initialValues: FormType = {
   name: 'Formulario sin Titulo',
@@ -21,11 +23,25 @@ const initialValues: FormType = {
 interface FormDataProps {
   id: string | string[] | undefined
 }
+interface SnackBar{
+  open: boolean
+  message: string
+}
 export const FormData = (props: FormDataProps) => {
   const { id } = props
+  const [loading, setLoading] = useState(false)
+  const [snackBar, setSnackBar] = useState<SnackBar>({ open: false, message: '' })
   const submitForm = async (values: FormType) => {
-    const result = await ApiForm().put('/form', values)
-    alert(`Formulario guardado ${JSON.stringify(result)}`)
+    setLoading(true)
+    const result = await ApiForm().put<Form>('/form', values)
+    if (result.status === 200) {
+      setLoading(false)
+      setInitialData(result.data)
+      setSnackBar({ open: true, message: 'Formulario guardado correctamente' })
+    }
+  }
+  const handleCloseSnackBar = () => {
+    setSnackBar({ open: false, message: '' })
   }
   const [initialData, setInitialData] = useState(initialValues)
   const formik = useFormik({
@@ -42,7 +58,14 @@ export const FormData = (props: FormDataProps) => {
     }
   }, [formData])
   return (
-    <Container className='my-10 pt-5'>
+    <Container className='my-10 pt-5 px-0'>
+      <Snackbar
+        open={snackBar.open}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackBar}
+      >
+        <Alert severity="success">{snackBar.message}</Alert>
+      </Snackbar>
       <span className='text-4xl text-black'>Datos Formulario</span>
       <form
         onSubmit={formik.handleSubmit}
@@ -51,6 +74,7 @@ export const FormData = (props: FormDataProps) => {
         <TextField
           fullWidth
           id='name'
+          onFocus={e => e.target.select()}
           error={!!(formik.touched.name && formik.errors.name)}
           placeholder='Titulo del formulario'
           inputProps={{ style: { fontSize: '2rem' } }}
@@ -61,6 +85,7 @@ export const FormData = (props: FormDataProps) => {
         />
         <TextField
           fullWidth
+          onFocus={e => e.target.select()}
           id='description'
           error={!!(formik.touched.description && formik.errors.description)}
           placeholder='Descripcion del Formulario'
@@ -70,14 +95,17 @@ export const FormData = (props: FormDataProps) => {
           variant='standard'
         />
         <div className='pt-5'>
-          <Button
+          <LoadingButton
             type='submit'
+            loading={loading}
+            loadingPosition='start'
             variant='contained'
             color='primary'
             className='mt-10'
+            startIcon={<SaveIcon />}
           >
-            Actualizar
-          </Button>
+            {loading ? 'guardando...' : 'Actualizar'}
+          </LoadingButton>
         </div>
       </form>
     </Container>

@@ -20,6 +20,7 @@ export interface Question {
   questionText: string
   questionType: number
   updateAt: Date
+  isRequire: boolean
 }
 
 export interface Option {
