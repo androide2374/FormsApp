@@ -1,6 +1,6 @@
 import { Button, Container } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { ApiForm } from '../../pages/api/apiForm'
+import { ApiForm } from '../../../pages/api/apiForm'
 import {
   Question,
   QuestionForm,
@@ -181,6 +181,12 @@ export const Questions = (props: QuestionsProps) => {
         console.log(err)
       })
   }
+  const removeQuestion = (questionIndex: number) => {
+    const newQuestions = { ...questions }
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete newQuestions.questions[questionIndex]
+    setQuestions(newQuestions)
+  }
   return (
     <Container
       maxWidth='lg'
@@ -189,6 +195,7 @@ export const Questions = (props: QuestionsProps) => {
       <form>
         {questions.questions.map((question, questionindex) => (
           <QuestionItem
+            removeQuestion={removeQuestion}
             handleRequired={handleRequired}
             key={questionindex}
             question={question}

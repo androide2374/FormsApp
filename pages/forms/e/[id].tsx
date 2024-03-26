@@ -1,17 +1,49 @@
 import { Box, Checkbox, Container, Divider, FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography } from '@mui/material'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { AppBar } from '../../../components/appBar/AppBar'
-import { useForm } from '../../../hooks/useForm'
-import { QuestionTypeEnum } from '../../../types/response/question.type'
+import { useContext, useEffect, useState } from 'react'
+import { AppBar } from '../../../src/components/appBar/AppBar'
+import { Context } from '../../../src/context/formEditContext'
+import { QuestionTypeEnum } from '../../../src/types/response/question.type'
+import { RespuestaDeFormulario } from '../../../src/types/respuestasDeFormulario'
+import { ApiForm } from '../../api/apiForm'
 
 export default function Formulario () {
+  const { form: formData, setForm } = useContext(Context)
+  const instance = ApiForm()
+  const [loading, setLoading] = useState(true)
+  const [respues, setRespues] = useState<RespuestaDeFormulario[]>([])
   const router = useRouter()
   const { id } = router.query
-  const { loading, formData } = useForm(id)
+  useEffect(() => {
+    if (!id) return
+    instance.get(`form/id?id=${id.toString()}`)
+      .then(result => {
+        const { data } = result
+        setForm(data)
+        setLoading(false)
+      }).catch(error => {
+        console.log(error)
+        alert('Error al obtener el formulario')
+      })
+  }, [id])
+  const responder = (id: string, e: any, name: string) => {
+    const { value } = e.target
+    const respuesta: RespuestaDeFormulario = {
+      idPregunta: id,
+      respuesta: value,
+      nombre: name
+    }
+    const index = respues.findIndex(r => r.idPregunta === id)
+    if (index === -1) {
+      setRespues([...respues, respuesta])
+    } else {
+      const newRespues = [...respues]
+      newRespues[index] = respuesta
+      setRespues(newRespues)
+    }
+  }
   const [SelectedValue, setSelectedValue] = useState('')
-  console.log(formData)
   if (loading) return <div>Cargando...</div>
   return (
     <>
@@ -32,7 +64,7 @@ export default function Formulario () {
           </Typography>
           <Divider />
           <Typography variant='subtitle1'>
-            {formData?.name}
+            {formData?.description}
           </Typography>
         </Box>
         {formData?.questions && formData?.questions.map((question, index) => (
@@ -42,7 +74,7 @@ export default function Formulario () {
             </Typography>
             <Divider />
             {question.questionType === QuestionTypeEnum.RESPUESTA_CORTA && (
-              <TextField placeholder='Ingrese su respuesta aqui' variant='standard' fullWidth />
+              <TextField placeholder='Ingrese su respuesta aqui' variant='standard' fullWidth onChange={(e) => responder(question.id, e, question.questionText)} />
             )}
             {question.questionType === QuestionTypeEnum.RESPUESTA_PARRAFO && (
               <TextField placeholder='Ingrese su respuesta aqui' variant='standard' fullWidth multiline rows={4} />

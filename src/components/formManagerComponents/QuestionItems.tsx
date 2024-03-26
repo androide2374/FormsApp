@@ -24,6 +24,7 @@ interface QuestionItemProps {
   handleChangeQuestionType: (question: any, index: number) => void
   removeOption: (questionIndex: number, optionIndex: number) => void
   addOption: (questionIndex: number) => void
+  removeQuestion: (questionIndex: number) => void
   handleChangeOption: (
     value: string,
     questionIndex: number,
@@ -45,7 +46,8 @@ export const QuestionItem = (props: QuestionItemProps) => {
     handleChangeOption,
     questionLength,
     addQuestion,
-    handleRequired
+    handleRequired,
+    removeQuestion
   } = props
   return (
     <div key={index} className="my-5">
@@ -127,9 +129,10 @@ export const QuestionItem = (props: QuestionItemProps) => {
           <Button
             variant="contained"
             color="primary"
+            disabled={questionLength === 1}
             onClick={(e) => {
               e.preventDefault()
-              addQuestion()
+              removeQuestion(index)
             }}
           >
             -

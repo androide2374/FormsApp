@@ -2,11 +2,11 @@ import { AppBar, Box, Button, Container, Divider, Tab, Tabs, Toolbar, Typography
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { ShareDialog } from '../../../components/DialogsComponents/ShareDialog'
-import { FormData } from '../../../components/formManagerComponents/FormData'
-import { Questions } from '../../../components/formManagerComponents/Questions'
-import { TabPanel } from '../../../components/tab/TabPanel'
-import { useForm } from '../../../hooks/useForm'
+import { ShareDialog } from '../../../src/components/DialogsComponents/ShareDialog'
+import { FormData } from '../../../src/components/formManagerComponents/FormData'
+import { Questions } from '../../../src/components/formManagerComponents/Questions'
+import { TabPanel } from '../../../src/components/tab/TabPanel'
+import { useForm } from '../../../src/hooks/useForm'
 // import { Form as FormType } from '../../../types/form.responses.types'
 
 // const initialValues: FormType = {

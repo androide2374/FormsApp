@@ -4,7 +4,9 @@
     "standard-with-typescript"
   ],
   "parserOptions": {
-    "project": ["./tsconfig.json"],
+    "project": [
+      "./tsconfig.json"
+    ],
     "ecmaFeatures": {
       "jsx": true
     }
@@ -24,6 +26,8 @@
     "react/jsx-tag-spacing": 2,
     "react/prop-types": 0,
     "react/display-name": 0,
-    "@typescript-eslint/return-await": 0
+    "react-hooks/exhaustive-deps": 0,
+    "@typescript-eslint/return-await": 0,
+    "@typescript-eslint/consistent-type-assertions": 0
   }
 }
